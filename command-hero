@@ -1,0 +1,38 @@
+#!/usr/bin/env python3
+import sys, argparse
+import base64
+import json
+from urllib.request import urlopen
+
+global _cmdfuapi
+_cmdfuapi = "http://www.commandlinefu.com/commands/"
+
+def searchApi(search):
+    b64 = base64.b64encode(search.encode())
+    url = _cmdfuapi+"/matching/"+search+"/"+b64.decode()+"/bys=/sort-by-votes/json"
+    return urlopen(url).read()
+
+def top():
+    return urlparse(cmdfuapi+"browse/sort-by-votes/json")
+
+def main(argv):
+    parser = argparse.ArgumentParser(description='Get command from commandlinefu.')
+    parser.add_argument('--count', '-c', type=int, help='number of commands to display', required=False, default=3)
+    parser.add_argument('search', type=str, help='search command')
+    parser.add_argument('--verbose', '-v', action="store_true", help='moar info about command')
+
+    args = parser.parse_args()
+   
+    print()
+    output = searchApi(args.search)
+    for i in json.loads(output.decode())[:args.count]:
+        if args.verbose:
+           print(i["command"])
+           print(i["summary"])
+           print(i["url"])
+           print("-"*60)
+        else:
+           print(i["command"])
+    
+if __name__ == "__main__":
+   main(sys.argv[1:])
